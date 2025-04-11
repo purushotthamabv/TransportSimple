@@ -1,0 +1,54 @@
+.visualizer {
+    position: relative;
+    width: 1500px;
+    height: 300px;
+}
+
+.trip-node {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    line-height: 30px;
+    font-size: 10px;
+    z-index: 2;
+}
+
+.trip-line {
+    position: absolute;
+    height: 2px;
+    background: gray;
+    transform-origin: 0 0;
+    z-index: 1;
+}
+
+.line-arrow::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -4px;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 8px solid gray;
+}
+
+/* Optional curved lines as visual hack */
+.line-curve-up {
+    border-top: 2px solid orange;
+    border-radius: 50%;
+    width: 80px;
+    height: 40px;
+    transform: rotate(0deg);
+}
+
+.line-curve-down {
+    border-bottom: 2px solid blue;
+    border-radius: 50%;
+    width: 80px;
+    height: 40px;
+    transform: rotate(0deg);
+}
