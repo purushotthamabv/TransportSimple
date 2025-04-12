@@ -1,10 +1,7 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { Trip } from '../../model/trip.model';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { TripService } from '../../services/trip.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-trip-visualizer',
@@ -14,59 +11,90 @@ import { Router } from '@angular/router';
   styleUrl: './trip-visualizer.component.scss'
 })
 export class TripVisualizerComponent {
-  @Input() trips: Trip[] = [];
-  positions: { x: number; y: number; trip: Trip }[] = [];
+  startPoint = '';
+  endPoint = '';
+  trips: Trip[] = [];
+  lastTrip: any;
+  firstTrip: any;
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['trips']) {
-      let x = 60;
-      this.positions = this.trips.map(t => {
-        const y = this.getY(t.level);
-        const p = { x, y, trip: t };
-        x += 140;
-        return p;
-      });
+  isTripInputValid(): boolean {
+    return (
+      this.startPoint.trim().length >= 3 &&
+      this.endPoint.trim().length >= 3
+    );
+  }
+
+  ngOnInit(): void {
+    const stored = localStorage.getItem('trips');
+    if (stored) {
+      this.trips = JSON.parse(stored);
     }
   }
 
-  getY(level: number) {
-    return level === 1 ? 100 : level === 2 ? 60 : 140;
+  onTripInputChange() {
+    this.lastTrip = this.trips[this.trips.length - 1];
+    this.firstTrip = this.trips[0];
   }
 
-  getLineClass(type: string): string {
-    return {
-      'continued': 'line-straight',
-      'constant': 'line-curve-up',
-      'returned': 'line-curve-down',
-      'diverted': 'line-curve-up'
-    }[type] || 'line-arrow';
-  }
-  
-  getLineStyle(i: number): any {
-    const a = this.positions[i];
-    const b = this.positions[i + 1];
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const length = Math.sqrt(dx * dx + dy * dy);
-    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-  
-    return {
-      left: `${a.x + 15}px`,
-      top: `${a.y + 15}px`,
-      width: `${length}px`,
-      transform: `rotate(${angle}deg)`
+  addTrip() {
+    const start = this.startPoint.slice(0, 3).toUpperCase();
+    const end = this.endPoint.slice(0, 3).toUpperCase();
+
+    let nextLevel = 1;
+
+    // Load previous trips
+    const stored = localStorage.getItem('trips');
+    if (stored) {
+      this.trips = JSON.parse(stored);
+    }
+
+    // Get previous trip references
+    this.lastTrip = this.trips[this.trips.length - 1];
+    this.firstTrip = this.trips[0];
+
+    // Default trip structure
+    const newTrip: Trip = {
+      start,
+      end,
+      level: 1,
+      continued: false,
+      repeated: false
     };
+
+    if (!this.lastTrip) {
+      newTrip.continued = true;
+    } else {
+      if (this.firstTrip.start === end) {
+        newTrip.arrowed = true;
+      } if(this.firstTrip.start && this.lastTrip.end == end) {
+        newTrip.arrowed = true;
+        nextLevel = 2;
+      }
+      if (this.lastTrip.end === start) {
+        newTrip.continued = true;
+      } else if (this.lastTrip.start === start && this.lastTrip.end === end) {
+        newTrip.repeated = true;
+        newTrip.level = 2;
+      } else {
+        const earlierTrip = this.trips.find(t => t.start === start && t.end === end);
+        if (earlierTrip) {
+          newTrip.repeated = true;
+          newTrip.level = 2;
+        }
+      }
+    }
+
+    this.trips.push(newTrip);
+    localStorage.setItem('trips', JSON.stringify(this.trips));
+    this.startPoint = '';
+    this.endPoint = '';
   }
 
-  getColor(level: number) {
-    return level === 1 ? '#333' : level === 2 ? 'orange' : 'blue';
+  resetTrip() {
+    const confirmed = confirm('Are you sure you want to reset all trip data?');
+    if (confirmed) {
+      localStorage.clear();
+      window.location.reload();
+    }
   }
-
-  getPath(i: number) {
-    const a = this.positions[i];
-    const b = this.positions[i + 1];
-    const dy = a.trip.level === 2 ? -40 : 40;
-    return `M${a.x},${a.y} C${a.x + 30},${a.y + dy} ${b.x - 30},${b.y + dy} ${b.x},${b.y}`;
-  }
-
 }
