@@ -1,31 +1,43 @@
+<div class="trip-visualizer">
+      <p style="text-align: center;">Visualize your trips with various styles and options.</p>
+
+    <div class="instructions" style="margin: 30px 0; background: #f0f4f8; padding: 30px; border-radius: 15px; font-size: 14px;">
+        <strong>Instructions:</strong>
+        <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+            <li>Enter a series of trips by providing a <strong>Start</strong> and <strong>End</strong> point.</li>
+            <li>Trips that continue from the previous end point appear as <strong>straight lines</strong> on Level 1.
+            </li>
+            <li>Trips with the <strong>same start and end consecutively</strong> are shown on <strong>Level 2</strong>.
+            </li>
+            <li>New diversions (non-continued trips) are displayed with <strong>curved lines</strong> or
+                <strong>arrows</strong>.</li>
+            <li>Repeated trips from earlier (non-consecutive) also appear on <strong>Level 2</strong>.</li>
+            <li>The most recent trip appears at the bottom; earlier trips are stacked above.</li>
+        </ul>
+    </div>
+</div>
+
+
 <div class="trip-form">
-    <input type="text" placeholder="Start Point" [(ngModel)]="startPoint" (input)="onTripInputChange()" />
+    <input type="text" placeholder="Start Point" [(ngModel)]="startPoint" />
     <input type="text" placeholder="End Point" [(ngModel)]="endPoint" />
-    <button (click)="addTrip()" [disabled]="!isTripInputValid()">
-        Add Trip
-    </button>
-    
-    <button (click)="resetTrip()">
-        Reset Trip
-    </button>
+    <button (click)="addTrip()" [disabled]="!isTripInputValid()">Add Trip</button>
+    <button (click)="resetTrip()">Reset Trip</button>
 </div>
 
 <div class="trip-container">
     <div *ngFor="let trip of trips" class="trip-row">
         <div class="trip-column">
-
             <div class="trip-box">{{ trip.start }}-{{ trip.end }}</div>
             <div class="trip-box-lines">
                 <span class="circle"></span>
-
                 <div class="trip-line" [ngClass]="{
-                  'line-straight': trip.continued,
-                  'line-arrowed': trip.arrowed,
-                  'line-diversion-up': trip.diversionUp,
-                  'line-diversion-down': trip.diversionDown,
-                  'line-repeated': trip.repeated,
-                  'line-shift-layout': trip.newDestination
-                }"></div>
+            'line-straight': trip.continued,
+            'line-arrowed': trip.arrowed,
+            'line-repeated': trip.repeated,
+            'line-diversion-up': trip.diversionUp,
+            'line-diversion-down': trip.diversionDown
+          }"></div>
             </div>
         </div>
     </div>

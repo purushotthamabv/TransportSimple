@@ -113,9 +113,17 @@ span {
     border-bottom: 6px solid transparent;
     border-left: 10px solid blue;
 }
+
 .line-repeated::after {
-    border-left: 10px solid gray;
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 10px solid gray;
 }
+
 
 .line-diversion-up {
     width: 100px;
